@@ -1,0 +1,1 @@
+psql -d demodb -U demopostgres "password = demopostgres123" -a -f ./dummyData.sql
