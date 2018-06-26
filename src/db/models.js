@@ -22,7 +22,8 @@ const Person = db.define(
     email: Sequelize.CHAR(80),
     age: Sequelize.INTEGER,
     gender: Sequelize.TEXT,
-    country: Sequelize.TEXT
+    country: Sequelize.TEXT,
+    imageUri: Sequelize.TEXT
   },
   { ...BASE_MODEL_OPTIONS }
 );
