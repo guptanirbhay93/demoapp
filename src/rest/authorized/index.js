@@ -14,6 +14,12 @@ restRouter.get("/app-list/:userId", function(req, res, next) {
   });
 });
 
+restRouter.get("/app-demographics/:appId/:type", function(req, res, next) {
+  dbService
+    .getAppDemographics(req.params.appId, req.params.type)
+    .then(resp => res.json({ resp }));
+});
+
 restRouter.get("/populate", function(req, res, next) {
   dbService
     .pushDummyData()

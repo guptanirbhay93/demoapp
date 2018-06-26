@@ -18,12 +18,11 @@ const Person = db.define(
       unique: true,
       allowNull: true
     },
-    firstName: Sequelize.CHAR(80),
-    lastName: Sequelize.CHAR(80),
+    name: Sequelize.CHAR(80),
     email: Sequelize.CHAR(80),
     age: Sequelize.INTEGER,
     gender: Sequelize.TEXT,
-    created: Sequelize.DATE
+    country: Sequelize.TEXT
   },
   { ...BASE_MODEL_OPTIONS }
 );

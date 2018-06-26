@@ -1,7 +1,6 @@
 CREATE TABLE public.person (
   id          bigserial primary key,
-  "firstName" varchar(80), 
-  "lastName"  varchar(80), 
+  name        varchar(80),  
   email       varchar(80), 
   age         integer,
   gender      varchar(80),

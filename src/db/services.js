@@ -3,10 +3,44 @@ const models = require("./models");
 const db = require("./index");
 const SQL_Operators = Sequelize.Op;
 
+const getSQLRawQuery = (appId, type) => {
+  switch (type) {
+    case "age":
+      return `SELECT count(public.person.id) as count, (age/10)*10 as "ageRange"  from public.person INNER JOIN public.app_user ON public.person.id = public.app_user."userId" WHERE "appId" = ${appId} GROUP BY "ageRange" ORDER BY "ageRange"`;
+    case "gender":
+      return `SELECT count(public.person.id) as count, "gender" FROM public.person INNER JOIN public.app_user ON public.person.id = public.app_user."userId" WHERE "appId" = ${appId} GROUP BY "gender"`;
+    case "country":
+      return `SELECT count(public.person.id) as count, "country" FROM public.person INNER JOIN public.app_user ON public.person.id = public.app_user."userId" WHERE "appId" = ${appId} GROUP BY "country"`;
+  }
+};
+
+const createUser = user => {
+  console.log(user);
+  return models.Person.create({
+    ...user
+  }).then(
+    user => {
+      console.log(user);
+      return user;
+    },
+    err => {
+      console.log(err);
+      return err;
+    }
+  );
+};
+
 const getUser = userId => {
   return models.Person.findOne({
     where: {
       id: userId
+    }
+  });
+};
+const getUserByEmail = email => {
+  return models.Person.findOne({
+    where: {
+      email
     }
   });
 };
@@ -58,13 +92,18 @@ const appDemographics = appId => {
 const getTopApps = topNCount => {
   return db
     .query(
-      `SELECT SUM("count")as "totalCount", SUM(CASE WHEN "gender" = \'M\' THEN "count" ELSE 0 END) AS femaleCount, SUM(CASE WHEN "gender" = \'F\' THEN "count" ELSE 0 END) AS maleCount, "appId" FROM (SELECT count("userId"), "appId", "gender" FROM public.app_user INNER JOIN public.person ON public.person.id="userId" GROUP BY "appId", "gender" ORDER BY "appId", "gender") AS temptable GROUP BY "appId" ORDER BY "totalCount" DESC LIMIT ${topNCount ||
+      `SELECT SUM("count")as "totalCount", SUM(CASE WHEN "gender" = \'M\' THEN "count" ELSE 0 END) AS "femaleCount", SUM(CASE WHEN "gender" = \'F\' THEN "count" ELSE 0 END) AS "maleCount", "appId" FROM (SELECT count("userId"), "appId", "gender" FROM public.app_user INNER JOIN public.person ON public.person.id="userId" GROUP BY "appId", "gender" ORDER BY "appId", "gender") AS temptable GROUP BY "appId" ORDER BY "totalCount" DESC LIMIT ${topNCount ||
         5}`,
       {
         type: db.QueryTypes.SELECT
       }
     )
     .then(counts => counts);
+};
+const getAppDemographics = (appId, type) => {
+  return db.query(getSQLRawQuery(appId, type), {
+    type: db.QueryTypes.SELECT
+  });
 };
 
 const pushDummyData = () => {
@@ -92,10 +131,13 @@ const pushDummyData = () => {
 };
 
 module.exports = {
+  createUser,
+  getUserByEmail,
   getUser,
   updateUser,
   findUserApps,
   getApps,
   pushDummyData,
-  getTopApps
+  getTopApps,
+  getAppDemographics
 };
