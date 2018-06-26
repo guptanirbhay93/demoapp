@@ -7,6 +7,7 @@ Auth_Router.post("/verify-token", function(req, res, next) {
   gService
     .verify(req.body.token)
     .then(resp => {
+      console.log(resp);
       res.json(resp);
     })
     .catch(err => {
