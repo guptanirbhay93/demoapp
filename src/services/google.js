@@ -11,7 +11,12 @@ async function verify(idToken) {
   });
   const payload = ticket.getPayload();
   const userid = payload["sub"];
-  return { valid: true, email: payload.email };
+  return {
+    valid: true,
+    email: payload.email,
+    name: payload.given_name + " " + payload.family_name,
+    imageUri: payload.photoUrl
+  };
 }
 
 module.exports = {
