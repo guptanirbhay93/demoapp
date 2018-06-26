@@ -1,6 +1,20 @@
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
+const express = require("express");
+const gService = require("./services/google");
 
-// passport.use(new GoogleStrategy({
-//   clientID:
-// }))
+const Auth_Router = express.Router();
+
+Auth_Router.post("/verify-token", function(req, res, next) {
+  gService
+    .verify(req.body.token)
+    .then(resp => {
+      res.json(resp);
+    })
+    .catch(err => {
+      console.log(err);
+      res.json({
+        valid: false
+      });
+    });
+});
+
+module.exports = Auth_Router;

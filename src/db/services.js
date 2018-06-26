@@ -25,7 +25,7 @@ const createUser = user => {
     },
     err => {
       console.log(err);
-      return err;
+      return Promise.reject(err);
     }
   );
 };
