@@ -1,8 +1,15 @@
+CREATE TABLE public.session(
+  id    bigserial primary key,
+  email text,
+  token text
+);
+ALTER TABLE public.session OWNER TO demopostgres;
+
 CREATE TABLE public.person (
   id          bigserial primary key,
   name        varchar(80),  
   email       varchar(80), 
-  imageUri    text,
+  "imageUri"    text,
   age         integer,
   gender      varchar(80),
   country     text

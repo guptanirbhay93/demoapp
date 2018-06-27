@@ -8,6 +8,22 @@ const BASE_MODEL_OPTIONS = {
   updatedAt: false
 };
 
+const Session = db.define(
+  "session",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      unique: true,
+      allowNull: true
+    },
+    token: Sequelize.TEXT,
+    email: Sequelize.TEXT
+  },
+  { ...BASE_MODEL_OPTIONS }
+);
+
 const Person = db.define(
   "person",
   {
@@ -64,5 +80,6 @@ const PersonApp = db.define(
 module.exports = {
   Person,
   App,
-  PersonApp
+  PersonApp,
+  Session
 };

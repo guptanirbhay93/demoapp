@@ -6,16 +6,19 @@ const Auth_Router = require("./auth");
 const OpenAPI_Router = require("./rest/open/index");
 const AuthorizedAPI_Router = require("./rest/authorized/index");
 const User_Router = require("./rest/user/index");
+const authenticator = require("./middlewares/authMiddleware");
 const app = express();
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+//Open Routes
 app.use("/auth", Auth_Router);
-app.use("/user", User_Router);
 app.use("/api/open", OpenAPI_Router);
-app.use("/api/authorized", AuthorizedAPI_Router);
+//Authoried Routes
+app.use("/user", authenticator, User_Router);
+app.use("/api/authorized", authenticator, AuthorizedAPI_Router);
 
 app.use(function(req, res, next) {
   next(createError(404));

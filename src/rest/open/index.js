@@ -19,4 +19,15 @@ restRouter.get("/topN/:count?", function(req, res, next) {
   });
 });
 
+restRouter.get("/get-auth-token/:email", function(req, res, next) {
+  dbService
+    .createSession(req.params.email)
+    .then(resp =>
+      res.json({
+        token: resp.token
+      })
+    )
+    .catch(err => res.json({ err }));
+});
+
 module.exports = restRouter;

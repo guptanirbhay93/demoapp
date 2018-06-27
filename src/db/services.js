@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const models = require("./models");
 const db = require("./index");
+const uuidv4 = require("uuid/v4");
 const SQL_Operators = Sequelize.Op;
 
 const getSQLRawQuery = (appId, type) => {
@@ -12,6 +13,48 @@ const getSQLRawQuery = (appId, type) => {
     case "country":
       return `SELECT count(public.person.id) as count, "country" FROM public.person INNER JOIN public.app_user ON public.person.id = public.app_user."userId" WHERE "appId" = ${appId} GROUP BY "country"`;
   }
+};
+
+const createSession = email => {
+  const newToken = uuidv4();
+  console.log(newToken);
+  return models.Session.create({
+    email,
+    token: newToken
+  }).then(
+    session => {
+      console.log(session);
+      return session;
+    },
+    err => {
+      console.log(err);
+      return Promise.reject(err);
+    }
+  );
+};
+
+const findSession = token => {
+  return models.Session.findOne({
+    where: { token: token }
+  }).then(
+    session => {
+      if (session && session.token) {
+        return session;
+      } else {
+        return Promise.reject("No Token available");
+      }
+    },
+    err => {
+      console.log(err);
+      Promise.reject(err);
+    }
+  );
+};
+
+const deleteSession = token => {
+  return models.Session.destroy({
+    where: { token }
+  });
 };
 
 const createUser = user => {
@@ -54,9 +97,33 @@ const updateUser = (userId, body) => {
       where: {
         id: userId
       },
-      limit: 1
+      limit: 1,
+      returning: true
     }
-  );
+  ).then(resp => resp[1][0]);
+};
+
+const createUserApps = (appArray, userId) => {
+  try {
+    return Promise.all(
+      appArray.map(x =>
+        models.PersonApp.findOrCreate({
+          where: {
+            appId: x.id,
+            userId
+          },
+          defaults: {
+            installed: true,
+            appId: x.id,
+            userId
+          },
+          returning: true
+        })
+      )
+    ).then(values => values.map(x => x[0]));
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const findUserApps = userId => {
@@ -67,6 +134,26 @@ const findUserApps = userId => {
   });
 };
 
+const createApps = appNameArray => {
+  try {
+    return Promise.all(
+      appNameArray.map(x =>
+        models.App.findOrCreate({
+          where: {
+            name: x
+          },
+          defaults: {
+            name: x,
+            iconUrl: "N/A"
+          },
+          returning: true
+        })
+      )
+    ).then(values => values.map(x => x[0]));
+  } catch (error) {
+    console.log(error);
+  }
+};
 const getApps = appIdArray => {
   return models.App.findAll({
     where: {
@@ -131,12 +218,17 @@ const pushDummyData = () => {
 };
 
 module.exports = {
+  createSession,
+  findSession,
+  deleteSession,
   createUser,
   getUserByEmail,
   getUser,
   updateUser,
-  findUserApps,
+  createApps,
   getApps,
+  createUserApps,
+  findUserApps,
   pushDummyData,
   getTopApps,
   getAppDemographics

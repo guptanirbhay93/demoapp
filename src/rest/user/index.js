@@ -18,9 +18,17 @@ userRouter.get("/profile/email/:email", function(req, res, next) {
 userRouter.post("/signup", function(req, res, next) {
   try {
     dbService
-      .getUserByEmail(req.body.email)
+      .findSession(req.header("Authorization").split(" ")[0])
+      .then(session => {
+        if (session.email === req.body.email) {
+          return dbService.getUserByEmail(session.email);
+        } else {
+          Promise.reject({
+            invalid: true
+          });
+        }
+      })
       .then(user => {
-        console.log(user, "USER");
         if (user) {
           return user;
         } else {
@@ -44,13 +52,26 @@ userRouter.post("/signup", function(req, res, next) {
 });
 
 userRouter.post("/create", function(req, res, next) {
-  dbService.createUser(req.body).then((user, err) => res.json({ user }));
+  dbService
+    .createUser(req.body)
+    .then(user => res.json({ user }), err => res.status(400).json({ err }));
 });
 
 userRouter.post("/update/:userId", function(req, res, next) {
-  dbService
-    .updateUser(Number(req.params.userId), req.body)
-    .then((user, err) => res.json({ user }));
+  if (req.authInfo.id === req.params.userId) {
+    dbService.updateUser(req.params.userId, req.body).then(
+      user => res.json({ user }),
+      err => {
+        res.statusCode = 400;
+        res.json({ err });
+      }
+    );
+  } else {
+    res.statusCode = 400;
+    res.json({
+      invalid: true
+    });
+  }
 });
 
 module.exports = userRouter;
