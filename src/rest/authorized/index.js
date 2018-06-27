@@ -7,10 +7,14 @@ restRouter.post("/app-list/:userId", function(req, res, next) {
     dbService
       .createApps(req.body.apps)
       .then(apps => {
-        console.log(apps);
-        return dbService
-          .createUserApps(apps, req.params.userId)
-          .then(resp => ({ apps: resp, appObj: apps }));
+        const appsObj = {};
+        apps.map(x => {
+          appsObj[x.id] = x;
+        });
+        return dbService.createUserApps(apps, req.params.userId).then(resp => ({
+          list: resp,
+          apps: appsObj
+        }));
       })
       .then(
         resp => {
@@ -38,8 +42,8 @@ restRouter.get("/app-list/:userId", function(req, res, next) {
     const appIds = resp.map(appUser => appUser.appId);
     dbService.getApps(appIds).then((appObj, err) => {
       res.json({
-        appUser: resp,
-        appObj
+        list: resp,
+        apps: appObj
       });
     });
   });
