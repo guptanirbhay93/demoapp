@@ -18,13 +18,19 @@ const getSQLRawQuery = (appId, type) => {
 const createSession = email => {
   const newToken = uuidv4();
   console.log(newToken);
-  return models.Session.create({
-    email,
-    token: newToken
+  return models.Session.findOrCreate({
+    where: {
+      email
+    },
+    defaults: {
+      email,
+      token: newToken
+    },
+    returning: true
   }).then(
     session => {
-      console.log(session);
-      return session;
+      console.log(session[0]);
+      return session[0];
     },
     err => {
       console.log(err);

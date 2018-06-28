@@ -10,16 +10,11 @@ passport.use(
         dbService.getUserByEmail(session.email).then(
           user => {
             if (user) {
-              cb(
-                null,
-                { token, ...user },
-                { token, id: user.id, email: user.email }
-              );
+              cb(null, { token }, { token, id: user.id, email: user.email });
             } else {
               cb(null, { token }, { token });
             }
           },
-
           err => cb(null, false)
         ),
       err => cb(err, null)

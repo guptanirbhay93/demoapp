@@ -9,7 +9,8 @@ CREATE TABLE public.person (
   id          bigserial primary key,
   name        varchar(80),  
   email       varchar(80), 
-  "imageUri"    text,
+  password    text,
+  "imageUri"  text,
   age         integer,
   gender      varchar(80),
   country     text

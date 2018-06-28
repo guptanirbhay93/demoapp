@@ -36,6 +36,7 @@ const Person = db.define(
     },
     name: Sequelize.CHAR(80),
     email: Sequelize.CHAR(80),
+    password: Sequelize.TEXT,
     age: Sequelize.INTEGER,
     gender: Sequelize.TEXT,
     country: Sequelize.TEXT,

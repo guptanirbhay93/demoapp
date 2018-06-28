@@ -7,7 +7,7 @@ const client = new a.OAuth2Client(c.IOS_CLIENT_ID);
 async function verify(idToken) {
   const ticket = await client.verifyIdToken({
     idToken,
-    audience: c.IOS_CLIENT_ID
+    audience: [c.IOS_CLIENT_ID, c.ANDROID_CLIENT_ID]
   });
   const payload = ticket.getPayload();
   const userid = payload["sub"];
