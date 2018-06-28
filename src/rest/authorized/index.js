@@ -4,6 +4,7 @@ const restRouter = express.Router();
 
 restRouter.post("/app-list/:userId", function(req, res, next) {
   try {
+    console.log(req.body.apps);
     dbService
       .createApps(req.body.apps)
       .then(apps => {
