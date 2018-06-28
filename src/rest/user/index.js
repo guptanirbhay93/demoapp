@@ -5,8 +5,8 @@ const userRouter = express.Router();
 
 userRouter.get("/profile/userId/:userId", function(req, res, next) {
   dbService
-    .getUser(Number(req.params.userId))
-    .then(({ password, ...user }) => res.json({ user }), err => res.json(err));
+    .getUser(req.params.userId)
+    .then(user => res.json({ user }), err => res.json(err));
 });
 
 userRouter.get("/profile/email/:email", function(req, res, next) {
